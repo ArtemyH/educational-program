@@ -27,4 +27,4 @@ class ProgramAdmin(admin.ModelAdmin):
 admin.site.register(EducationalArea)
 admin.site.register(EducationalCenter)
 admin.site.register(Institute)
-admin.site.register(EducationalProgram, ProgramAdmin)
+admin.site.register(EducationalProgram)

@@ -127,6 +127,7 @@ class EducationalProgram(models.Model):
         null=True
     )
 
+
     def __str__(self):
         return self.name
 
@@ -157,6 +158,6 @@ class EducationalProgram(models.Model):
         cont = f.read()
         # print(cont)
         # import ipdb; ipdb.set_trace()
-        self.order_to_open.save(path, ContentFile(cont), save=False)
+        self.order_to_open.save(filename, ContentFile(cont), save=False)
         f.close()
         super().save(*args, **kwargs)
