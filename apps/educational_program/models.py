@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -119,9 +121,8 @@ class EducationalProgram(models.Model):
         choices=EducationalForm.CHOICES,
         default=EducationalForm.INTERNAL
     )
-    order_to_open = models.FilePathField(
+    order_to_open = models.FileField(
         'Приказ об открытии',
-        path=settings.MEDIA_ROOT,
         blank=True,
         null=True
     )
@@ -130,11 +131,13 @@ class EducationalProgram(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        import ipdb; ipdb.set_trace()
         super().save(*args, **kwargs)
         doc = DocxTemplate(get_docx_template_path("open_course.docx"))
         context = {'educational_area': self.area}
         doc.render(context)
         filename = "open_course_{}.docx".format(self.id)
-        path = "docs/{}".format(filename)
+        path = os.path.join(settings.MEDIA_ROOT, "docs/{}".format(filename))
         doc.save(path)
-        self.order_to_open = path
+        f = open(path, 'r')
+        self.order_to_open.save(path, File(f))
