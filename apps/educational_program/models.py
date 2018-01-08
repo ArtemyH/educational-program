@@ -131,13 +131,32 @@ class EducationalProgram(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
         super().save(*args, **kwargs)
         doc = DocxTemplate(get_docx_template_path("open_course.docx"))
-        context = {'educational_area': self.area}
+        context = {
+            'educational_area': self.area,
+            'center': self.center,
+            'institute': self.institute,
+            'name': self.name,
+            'volume': self.volume,
+            'schedule': self.schedule,
+            'form': self.get_form_display(),
+            'start_date': self.start_date,
+            'head_post_genitive': self.head.post_genitive,
+            'head_fio_genitive': self.head.full_name_genitive,
+            'head_fio_dative': self.head.full_name_dative,
+            'checker_post_genitive': self.checker.post_genitive,
+            'checker_fio_genitive': self.checker.full_name_genitive,
+            'accountant_fio_dative': self.accountant.full_name_dative,
+        }
         doc.render(context)
         filename = "open_course_{}.docx".format(self.id)
         path = os.path.join(settings.MEDIA_ROOT, "docs/{}".format(filename))
         doc.save(path)
-        f = open(path, 'r')
-        self.order_to_open.save(path, File(f))
+        f = open(path, 'rb')
+        cont = f.read()
+        # print(cont)
+        # import ipdb; ipdb.set_trace()
+        self.order_to_open.save(path, ContentFile(cont), save=False)
+        f.close()
+        super().save(*args, **kwargs)
